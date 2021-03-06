@@ -1,19 +1,19 @@
-const { glob } = require('glob');
-const webpack = require('webpack');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const { glob } = require("glob");
+const webpack = require("webpack");
+const HtmlWebpackPlugin = require("html-webpack-plugin");
 
-const environment = process.env.NODE_ENV || 'development';
+const environment = process.env.NODE_ENV || "development";
 const src = __dirname + "/src";
 const dist = __dirname + "/docs";
 const isDevMode = environment === "development";
 let plugins = [];
 
 function getHtmlPath() {
-  const path = './src/view/';
+  const path = "./src/view/";
   const pattern = `${path}**/*.html`;
   const options = {
-    ignore: [ `${path}**/_*.html` ]
-  }
+    ignore: [`${path}**/_*.html`],
+  };
   let output = [];
   glob.sync(pattern, options).forEach((filePath) => {
     let fileName = filePath.replace(path, "");
@@ -23,15 +23,16 @@ function getHtmlPath() {
   return output;
 }
 
-
 getHtmlPath().forEach((filename) => {
-  plugins.push(new HtmlWebpackPlugin({
-    template: `view/${filename}`,
-    filename: filename
-  }));
+  plugins.push(
+    new HtmlWebpackPlugin({
+      template: `view/${filename}`,
+      filename: filename,
+    })
+  );
 });
 
-plugins.push(new webpack.ProvidePlugin({ $: 'jquery' }));
+plugins.push(new webpack.ProvidePlugin({ $: "jquery" }));
 
 module.exports = {
   context: src,
@@ -42,15 +43,15 @@ module.exports = {
   entry: "./js/main.js",
   output: {
     path: dist,
-    filename: "index.js"
+    filename: "index.js",
   },
   devServer: {
     contentBase: dist,
     open: true,
-    host: '0.0.0.0',
+    host: "0.0.0.0",
     overlay: true,
     useLocalIp: true,
-    quiet: true
+    quiet: true,
   },
   module: {
     rules: [
@@ -60,10 +61,15 @@ module.exports = {
         loader: "babel-loader",
         exclude: /node_modules/,
         options: {
-          presets: [
-            '@babel/preset-env',
-          ]
-        }
+          presets: ["@babel/preset-env"],
+        },
+      },
+      {
+        test: /\.(jpe?g|gif|png|svg|mp4)$/,
+        loader: "file-loader",
+        options: {
+          name: "[path][name].[ext]",
+        },
       },
       /****** SCSS Loader ******/
       {
@@ -75,31 +81,28 @@ module.exports = {
             options: {
               url: false,
               sourceMap: isDevMode,
-              importLoaders: 2
-            }
+              importLoaders: 2,
+            },
           },
           {
             loader: "postcss-loader",
             options: {
               sourceMap: isDevMode,
               postcssOptions: {
-                plugins: [
-                  ["autoprefixer", { grid: true }]
-                ]
-              }
-            }
+                plugins: [["autoprefixer", { grid: true }]],
+              },
+            },
           },
           {
             loader: "sass-loader",
             options: {
-              sourceMap: isDevMode
-            }
+              sourceMap: isDevMode,
+            },
           },
-          "import-glob-loader"
-        ]
-
-      }
+          "import-glob-loader",
+        ],
+      },
     ],
   },
-  plugins: plugins
+  plugins: plugins,
 };
